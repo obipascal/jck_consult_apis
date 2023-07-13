@@ -19,7 +19,7 @@ return new class extends Migration {
 			$table->string("phone_number")->nullable();
 			$table->enum("gender", ["male", "female", "others"])->nullable();
 			$table->enum("qualification", ["undergraduate", "graduate", "postgraduate"])->nullable();
-			$table->string("password");
+			$table->string("password")->nullable();
 
 			$table->text("access_token")->nullable();
 			$table->timestamp("email_verified_at")->nullable();

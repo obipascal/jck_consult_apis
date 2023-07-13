@@ -1,5 +1,6 @@
 <?php
 
+use App\Mail\AccountVerification;
 use Illuminate\Support\Facades\Route;
 use JCKCon\Enums\UsersPermissions;
 
@@ -15,5 +16,5 @@ use JCKCon\Enums\UsersPermissions;
 */
 
 Route::get("/", function () {
-	dd(UsersPermissions::toArray());
+	return (new AccountVerification("123411"))->render();
 });

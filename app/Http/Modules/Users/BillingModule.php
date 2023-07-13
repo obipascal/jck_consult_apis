@@ -6,16 +6,17 @@ use Illuminate\Support\Facades\Log;
 
 trait BillingModule
 {
-
-
-
 	public function addBillingInfo(string $accountId, array $params): bool|BillingInfo
 	{
 		try {
-
-
-			if (!$this->__save(new BillingInfo(), $params)) {
-				return false;
+			if (!$this->hasBillingInfo($accountId)) {
+				if (!$this->__save(new BillingInfo(), $params)) {
+					return false;
+				}
+			} else {
+				if (!$this->updateBillingInfo($accountId, $params)) {
+					return false;
+				}
 			}
 
 			return $this->getBillingInfo($accountId);
@@ -59,6 +60,18 @@ trait BillingModule
 			}
 
 			return $this->__delete($BillingInfo, "account_id", $BillingInfo->account_id);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+			return false;
+		}
+	}
+
+	public function hasBillingInfo(string $id): bool
+	{
+		try {
+			return BillingInfo::query()
+				->where("account_id", $id)
+				->exists();
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;

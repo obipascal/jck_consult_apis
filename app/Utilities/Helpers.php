@@ -1,7 +1,6 @@
 <?php namespace App\Utilities;
 
 use BadFunctionCallException;
-use Carbon\Carbon;
 use Closure;
 use ErrorException;
 use Illuminate\Console\Command;
@@ -10,8 +9,6 @@ use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use JCKCon\Enums\UsersPermissions;
 use Laminas\Escaper\Escaper;
-use libphonenumber\PhoneNumberFormat;
-use libphonenumber\PhoneNumberUtil;
 use NumberFormatter;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -1024,7 +1021,7 @@ if (!function_exists("formatCableTVProduct")) {
 	}
 }
 
-if (function_exists("random_id")) {
+if (!function_exists("random_id")) {
 	/**
 	 * Generate a random numeric ID
 	 *
