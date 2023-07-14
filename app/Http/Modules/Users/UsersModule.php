@@ -41,7 +41,7 @@ class UsersModule
 		return $this->get($User->account_id);
 	}
 
-	public function add(array $params, string $role = "admin"): bool|string
+	public function add(array $params, string $role = "admin"): bool|string|User
 	{
 		try {
 			if (!($account_id = $this->__save(new User(), $params, "account_id"))) {
@@ -54,7 +54,11 @@ class UsersModule
 
 			$this->generateAccessToken($NewUser, $role);
 
-			return $this->generateOTPCode($NewUser);
+			return match ($role) {
+				"user" => $this->generateOTPCode($NewUser),
+				"admin" => $NewUser,
+				default => $NewUser,
+			};
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;

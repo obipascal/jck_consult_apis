@@ -10,11 +10,11 @@ return new class extends Migration {
 	 */
 	public function up(): void
 	{
-		Schema::create("o_t_ps", function (Blueprint $table) {
+		Schema::create("f_a_qs", function (Blueprint $table) {
 			$table->id();
-			$table->string("email")->unique();
-			$table->unsignedBigInteger("otp_code")->nullable();
-			$table->timestamp("expires_in")->nullable();
+			$table->unsignedBigInteger("faq_id")->unique();
+			$table->string("title");
+			$table->text("content");
 			$table->timestamps();
 		});
 	}
@@ -24,6 +24,6 @@ return new class extends Migration {
 	 */
 	public function down(): void
 	{
-		Schema::dropIfExists("o_t_ps");
+		Schema::dropIfExists("f_a_qs");
 	}
 };

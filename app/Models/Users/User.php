@@ -18,6 +18,7 @@ class User extends Authenticatable
 {
 	use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+	protected $with = ["billing_info"];
 	/**
 	 * The attributes that are mass assignable.
 	 *
@@ -44,7 +45,7 @@ class User extends Authenticatable
 
 	public function accessToken(): Attribute
 	{
-		return Attribute::make(set: fn($value) => !empty($value) ? Crypt::encryptString($value) : $value, get: fn($value) => !empty($value) ? Crypt::decryptString($value) : $value);
+		return Attribute::make(set: fn($value) => !empty($value) ? Crypt::encryptString($value) : $value);
 	}
 
 	public function accountId(): Attribute

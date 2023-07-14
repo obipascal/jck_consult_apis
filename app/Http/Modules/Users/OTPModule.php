@@ -35,7 +35,7 @@ trait OTPModule
 		}
 	}
 
-	public function updateOTPCode(User $user, bool $expire = false): bool|string
+	public function updateOTPCode(User $user, bool $expire = false): bool|null|string
 	{
 		try {
 			if (!($OTP = $this->getOTPUser($user->email))) {
@@ -45,8 +45,8 @@ trait OTPModule
 			$expiersIn = Carbon::now()
 				->addHours(24)
 				->toDateTimeString();
-			$params["expires_in"] = !$expire ? $expiersIn : "";
-			$params["otp_code"] = !$expire ? random_id(5) : "";
+			$params["expires_in"] = $expire === false ? $expiersIn : null;
+			$params["otp_code"] = $expire === false ? random_id(5) : null;
 
 			if (!$this->__update($OTP, "email", $user->email, $params)) {
 				return false;

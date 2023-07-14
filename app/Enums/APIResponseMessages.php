@@ -7,4 +7,5 @@ enum APIResponseMessages: string
 	case ACCOUNT_404 = "Sorry! The provided email is not linked to any registered account.";
 	case OPS_ABORTED = "Sorry! Unable to complete your request at the moment.";
 	case PSWD_OPS_EXP = "Sorry! The password reset operation has expired.";
+	case UPL_ERR = "Sorry! We're unable to process your file upload at the mement please try again in a few minutes.";
 }

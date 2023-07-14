@@ -203,6 +203,8 @@ class UsersHandler
 
 			$params = $this->request->all(["city", "country", "house_no", "street"]);
 
+			/* Add the account id param */
+			$params["account_id"] = $id;
 			if (!($BillingInfo = Modules::User()->addBillingInfo($id, $params))) {
 				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
@@ -338,7 +340,7 @@ class UsersHandler
 
 			/* generate a reset password code and timed it */
 			$resetToken = Carbon::now()
-				->addMinute()
+				->addMinutes(30)
 				->toTimeString();
 			$encryptedToken = Crypt::encryptString($resetToken);
 
@@ -379,7 +381,7 @@ class UsersHandler
 			}
 
 			$now = Carbon::now();
-			$tokenTimer = Carbon::now()->createFromTime($token);
+			$tokenTimer = Carbon::createFromDate($token);
 
 			if ($now > $tokenTimer) {
 				return $this->raise(APIResponseMessages::PSWD_OPS_EXP->value, null, APIResponseCodes::CLIENT_ERR->value);
@@ -387,7 +389,7 @@ class UsersHandler
 
 			/* remove the reset token from params to update user password */
 			unset($params["reset_token"]);
-			if (!Modules::User()->update($User->id, $params)) {
+			if (!Modules::User()->update($User->account_id, $params)) {
 				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
 

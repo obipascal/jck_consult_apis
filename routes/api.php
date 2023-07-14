@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\SettingsApi;
 use App\Http\Controllers\Users\UsersApis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +35,7 @@ Route::prefix("v1")->group(function () {
 			 * @todo Update user profile
 			 * @api /api/v1/account/:account_id
 			 */
-			Route::put("/{id}", "updateProfile");
+			Route::put("/{id}", "update");
 			/**
 			 * @todo Show user profile
 			 * @api /api/v1/account/:account_id
@@ -44,27 +45,32 @@ Route::prefix("v1")->group(function () {
 			 * @todo Update billing information
 			 * @api /api/v1/account/billing/:account_id
 			 */
-			Route::get("billing/{id}", "billing");
+			Route::put("billing/{id}", "billing");
 			/**
 			 * @todo Delete user account
 			 * @api /api/v1/accountn/:account_id
 			 */
-			Route::delete("/{id}", "destory");
+			Route::delete("/{id}", "destroy");
 		});
 		/**
 		 * @todo Forget password
 		 * @api /api/v1/account/forget_password
 		 */
 		Route::post("forget_password", "forgotPassword");
-		/**
-		 * @todo Confirm password reset
-		 * @api /api/v1/account/fgpwd_confirm
-		 */
-		Route::post("fgpwd_confirm", "forgotPassword_confirmReset");
-		/**
-		 * @todo Reset confirm password
-		 * @api /api/v1/account/fgpwd_reset
-		 */
-		Route::post("fgpwd_reset", "forgotPassword_resetPassword");
+		Route::middleware("auth:sanctum")->group(function () {
+			/**
+			 * @todo Confirm password reset
+			 * @api /api/v1/account/fgpwd_confirm
+			 */
+			Route::post("fgpwd_confirm", "forgotPassword_confirmReset");
+			/**
+			 * @todo Reset confirm password
+			 * @api /api/v1/account/fgpwd_reset
+			 */
+			Route::post("fgpwd_reset", "forgotPassword_resetPassword");
+		});
 	});
+
+	/* Settings API */
+	Route::group(["prefix" => "settings", "controller" => SettingsApi::class, "middleware" => "auth:sanctum"], function () {});
 });
