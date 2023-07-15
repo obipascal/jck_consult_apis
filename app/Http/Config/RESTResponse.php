@@ -72,22 +72,12 @@ trait RESTResponse
 	 */
 	private function __sendAPIResponse()
 	{
-		if (is_array($this->RESPONSE)) {
-			$response = [];
-
-			foreach ($this->RESPONSE as $key => $res) {
-				$response[$key] = $res["body"] ?? null;
-			}
-		} else {
-			$response = $this->RESPONSE["body"] ?? null;
-		}
-
 		return response()->json(
 			[
 				"status" => $this->STATE,
 				"message" => $this->STATE === true ? $this->MESSAGE : $this->ERROR,
 				"resource" => $this->RESPONSE["type"] ?? ($this->STATE === true ? "global_resource" : null),
-				"data" => $response,
+				"data" => $this->RESPONSE["body"] ?? null,
 			],
 			$this->STATUSCODE
 		);

@@ -15,9 +15,9 @@ class SettingsModule
 	{
 		try {
 			$settingId = random_id();
-			$params["site_id"] = $settingId;
 
 			if (!$this->hasSettings()) {
+				$params["site_id"] = $settingId;
 				/* If application has no pre-set settings create one */
 				if (!$this->__save(new SiteSettings(), $params)) {
 					return false;

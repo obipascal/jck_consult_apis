@@ -5,6 +5,8 @@ use App\Http\Modules\Modules;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use JCKCon\Enums\APIResponseCodes;
 use JCKCon\Enums\APIResponseMessages;
@@ -16,27 +18,75 @@ class SettingsHandler
 	protected function processSiteLogoUpload(): bool|string
 	{
 		try {
-			DB::beginTransaction();
-
 			$siteLogo = $this->request->file("site_logo");
 
 			if (!$siteLogo->isValid()) {
 				return false;
 			}
 
+			/* check if there's an existing site logo already */
+			if (Modules::Settings()->hasSettings()) {
+				$Settings = Modules::Settings()->getConfigs();
+				if (!empty($Settings->logo)) {
+					$path = Str::replace(config("app.url") . "/", "", $Settings->logo);
+					$path = Str::replace("storage", "public", $path);
+
+					if (Storage::exists($path)) {
+						Storage::delete($path);
+					}
+				}
+			}
+
 			$path = $siteLogo->storePublicly("public/site_settings/logos");
 
 			return Str::replace("public/", "storage/", $path);
 			//-----------------------------------------------------
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			return false;
+		}
+	}
+
+	public function getSiteConfigs()
+	{
+		try {
+			DB::beginTransaction();
+
+			$perPage = $this->request->get("perPage") ?? 100;
+
+			if (!($Settings = Modules::Settings()->getConfigs())) {
+				DB::rollBack();
+				DB::commit();
+
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			if (!($FAQs = Modules::Settings()->getAllFAQ($perPage))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, site configs retrieved.";
+			$response["type"] = "settings";
+			$response["body"] = [
+				"faqs" => $FAQs,
+				"settings" => $Settings,
+			];
+			$responseCode = 200;
 
 			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 
 			DB::rollBack();
 			DB::commit();
 
-			return false;
+			return $this->raise();
 		}
 	}
 
@@ -44,6 +94,10 @@ class SettingsHandler
 	{
 		try {
 			DB::beginTransaction();
+
+			if (!Gate::check("isAdmin")) {
+				return $this->raise(APIResponseMessages::RES_UNAUTHORIZED->value, null, APIResponseCodes::UNAUTHORIZED->value);
+			}
 
 			$params = $this->request->all(["name", "desc", "about", "email", "phone_number", "line_address", "facebook_handle", "twitter_handle", "whatsapp_handle", "instagram_handle", "linkedin_handle"]);
 
@@ -255,7 +309,7 @@ class SettingsHandler
 		}
 	}
 
-	public function getFAQs()
+	public function getFAQs(): SettingsHandler
 	{
 		try {
 			DB::beginTransaction();

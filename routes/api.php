@@ -19,6 +19,11 @@ Route::prefix("v1")->group(function () {
 	/* Account apis */
 	Route::group(["prefix" => "account", "controller" => UsersApis::class], function () {
 		/**
+		 * @todo authorize account access
+		 * @api /api/v1/account/authorize
+		 */
+		Route::post("authorize", "authorizedAccountLogin");
+		/**
 		 * @todo Create New account
 		 * @api api/v1/account/create
 		 */
@@ -72,5 +77,45 @@ Route::prefix("v1")->group(function () {
 	});
 
 	/* Settings API */
-	Route::group(["prefix" => "settings", "controller" => SettingsApi::class, "middleware" => "auth:sanctum"], function () {});
+	Route::group(["prefix" => "settings", "controller" => SettingsApi::class, "middleware" => "auth:sanctum"], function () {
+		/**
+		 * @todo Create application settings
+		 * @api /api/v1/settings
+		 */
+		Route::post("/", "store");
+		/**
+		 * @todo Fetch site settings
+		 * @api /api/v1/settings/:site_id
+		 */
+		Route::get("/{id}", "show")->whereNumber("id");
+
+		/* FAQs */
+		Route::group(["prefix" => "faqs"], function () {
+			/**
+			 * @todo fetch all faqs
+			 * @api /api/v1/settings/faqs
+			 */
+			Route::get("/", "indexFAQ");
+			/**
+			 * @todo Create a new faq
+			 * @api /api/v1/settings/faqs
+			 */
+			Route::post("/", "storeFAQ");
+			/**
+			 * @todo Fetch a particular faq
+			 * @api /api/v1/settings/faqs
+			 */
+			Route::get("/{id}", "showFAQ")->whereNumber("id");
+			/**
+			 * @todo Update an faq
+			 * @api /api/v1/settings/faqs
+			 */
+			Route::put("/{id}", "updateFAQ");
+			/**
+			 * @todo remove an faq
+			 * @api /api/v1/settings/faqs/:faq_id
+			 */
+			Route::delete("/{id}", "destroyFAQ");
+		});
+	});
 });

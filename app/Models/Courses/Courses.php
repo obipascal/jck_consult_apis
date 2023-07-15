@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Models\Settings;
+namespace App\Models\Courses;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SiteSettings extends Model
+class Courses extends Model
 {
 	use HasFactory;
 
-	public function logo(): Attribute
+	public function image(): Attribute
 	{
 		$baseUrl = config("app.url");
 
 		return Attribute::get(fn($value) => !empty($value) ? "{$baseUrl}/{$value}" : $value);
 	}
 
-	public function about(): Attribute
+	public function body(): Attribute
 	{
 		return Attribute::get(fn($value) => !empty($value) ? html_entity_decode($value) : $value);
 	}

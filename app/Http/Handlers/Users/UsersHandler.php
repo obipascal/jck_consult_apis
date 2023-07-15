@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use JCKCon\Enums\APIResponseMessages;
 use JCKCon\Enums\APIResponseCodes;
@@ -245,6 +246,48 @@ class UsersHandler
 			$responseMessage = "Success, user account deleted successfully!";
 			$response["type"] = "";
 			$response["body"] = null;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function authorized()
+	{
+		try {
+			DB::beginTransaction();
+
+			$params = $this->request->all(["username", "password"]);
+
+			/* get the user */
+			/** @var User */
+			if (!($User = Modules::User()->get($params["username"]))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			// now validate user password
+			if (!Hash::check($params["password"], $User->password)) {
+				return $this->raise(APIResponseMessages::INVALID_PWD->value, null, APIResponseCodes::UNAUTHORIZED->value);
+			}
+
+			$User->api_token = $User->access_token;
+			$User->role = $User->getRoleNames()[0];
+			unset($User->roles);
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, account login successful";
+			$response["type"] = "account";
+			$response["body"] = $User;
 			$responseCode = 200;
 
 			DB::commit();

@@ -19,7 +19,7 @@ trait FAQSettingsModule
 				return false;
 			}
 
-			return $this->get($settingId);
+			return $this->getFAQ($settingId);
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;
@@ -29,7 +29,7 @@ trait FAQSettingsModule
 	public function updateFAQ(string $id, array $params): bool
 	{
 		try {
-			if (!($setting = $this->get($id))) {
+			if (!($setting = $this->getFAQ($id))) {
 				return false;
 			}
 
@@ -67,11 +67,11 @@ trait FAQSettingsModule
 	public function removeFAQ(string $id): bool
 	{
 		try {
-			if (!($settings = $this->get($id))) {
+			if (!($settings = $this->getFAQ($id))) {
 				return false;
 			}
 
-			return $this->__delete($settings, "faq_id", $settings->site_id);
+			return $this->__delete($settings, "faq_id", $settings->faq_id);
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;
