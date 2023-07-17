@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\AdminOnlyMiddleware;
 use App\Http\Middleware\Authentication\PSWebhookSignatureValidator;
 use App\Http\Middleware\EscapeRequestParams;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -15,7 +16,12 @@ class Kernel extends HttpKernel
 	 *
 	 * @var string[]
 	 */
-	protected $middlewarePriority = [EscapeRequestParams::class, \App\Http\Middleware\Authentication\DecryptToken::class, \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class];
+	protected $middlewarePriority = [
+		EscapeRequestParams::class,
+		\App\Http\Middleware\Authentication\DecryptToken::class,
+		\Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+		AdminOnlyMiddleware::class,
+	];
 
 	/**
 	 *
@@ -79,5 +85,6 @@ class Kernel extends HttpKernel
 		"throttle" => \Illuminate\Routing\Middleware\ThrottleRequests::class,
 		"verified" => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 		"pys_webhook" => PSWebhookSignatureValidator::class,
+		"adminOnly" => AdminOnlyMiddleware::class,
 	];
 }

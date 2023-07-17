@@ -10,4 +10,5 @@ enum APIResponseMessages: string
 	case UPL_ERR = "Sorry! We're unable to process your file upload at the mement please try again in a few minutes.";
 	case INVALID_PWD = "Incorrect account password. Please check the password and try again!";
 	case RES_UNAUTHORIZED = "Sorry, you're not authorized to access this resource.";
+	case NOT_FOUND = "Sorry, the resource you're attempting access does not exist.";
 }

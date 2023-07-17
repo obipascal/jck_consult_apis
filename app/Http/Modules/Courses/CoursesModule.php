@@ -16,6 +16,7 @@ class CoursesModule
 	{
 		try {
 			$courseId = random_id();
+			$params["course_id"] = $courseId;
 
 			if (!$this->__save(new Courses(), $params)) {
 				return false;
@@ -75,6 +76,20 @@ class CoursesModule
 		}
 	}
 
+    public function remove(string $id): bool
+	{
+		try {
+			if (!($Course = $this->get($id))) {
+				return false;
+			}
+
+			return $this->__delete($Course, "course_id", $Course->course_id);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+			return false;
+		}
+	}
+
 	public function getPublishedCourses(int $perPage = 50): bool|Paginator
 	{
 		try {
@@ -103,17 +118,5 @@ class CoursesModule
 		}
 	}
 
-	public function remove(string $id): bool
-	{
-		try {
-			if (!($Course = $this->get($id))) {
-				return false;
-			}
 
-			return $this->__delete($Course, "course_id", $Course->course_id);
-		} catch (Exception $th) {
-			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
-			return false;
-		}
-	}
 }

@@ -77,7 +77,7 @@ trait RESTResponse
 				"status" => $this->STATE,
 				"message" => $this->STATE === true ? $this->MESSAGE : $this->ERROR,
 				"resource" => $this->RESPONSE["type"] ?? ($this->STATE === true ? "global_resource" : null),
-				"data" => $this->RESPONSE["body"] ?? null,
+				"data" => $this->STATE === true ? $this->RESPONSE["body"] ?? null : $this->RESPONSE,
 			],
 			$this->STATUSCODE
 		);
