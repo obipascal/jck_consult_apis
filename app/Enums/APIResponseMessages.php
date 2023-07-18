@@ -11,4 +11,12 @@ enum APIResponseMessages: string
 	case INVALID_PWD = "Incorrect account password. Please check the password and try again!";
 	case RES_UNAUTHORIZED = "Sorry, you're not authorized to access this resource.";
 	case NOT_FOUND = "Sorry, the resource you're attempting access does not exist.";
+	case INVALID_START_DATE = "Sorry! The provided start date cannot be in the pass. It must be a date in the future.";
+	case PROMO_INACTIVE = "This promo code is not yet active. It looks like you're trying to apply a promo code that is set to go live on :duration, please check back later to try again thank you!";
+	case PROMO_EXP = "This promo code has expired an cannot be used.";
+
+	public static function inActivePromoCode(string $duration)
+	{
+		return str_replace(":duration", $duration, self::PROMO_INACTIVE->value);
+	}
 }

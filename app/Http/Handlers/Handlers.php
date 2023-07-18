@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use JCKCon\Http\Handlers\Courses\CoursesHandler;
+use JCKCon\Http\Handlers\Promos\PromosHandler;
 use JCKCon\Http\Handlers\Settings\SettingsHandler;
 use JCKCon\Http\Handlers\Users\UsersHandler;
 
@@ -20,5 +21,10 @@ class Handlers
 	public static function Courses(Request $request)
 	{
 		return new CoursesHandler($request);
+	}
+
+	public static function Promos(Request $request)
+	{
+		return new PromosHandler($request);
 	}
 }

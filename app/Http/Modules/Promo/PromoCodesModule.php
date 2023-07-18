@@ -1,4 +1,4 @@
-<?php namespace JCKCOn\Http\Modules\Promo;
+<?php namespace JCKCon\Http\Modules\Promo;
 
 use App\Http\Modules\Core\BaseModule;
 use App\Models\Promos\PromoCodes;
@@ -6,13 +6,14 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\Log;
+use JCKCon\Http\Modules\Promo\PromoCodeUsageModule;
 
 use function App\Utilities\random_id;
 use function App\Utilities\random_string;
 
 class PromoCodesModule
 {
-	use BaseModule;
+	use BaseModule, PromoCodeUsageModule;
 
 	public function add(array $params): bool|PromoCodes
 	{

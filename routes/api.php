@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Courses\CoursesApis;
+use App\Http\Controllers\Promos\PromotionApis;
 use App\Http\Controllers\Settings\SettingsApi;
 use App\Http\Controllers\Users\UsersApis;
 use Illuminate\Http\Request;
@@ -153,5 +154,24 @@ Route::prefix("v1")->group(function () {
 		 * @api /api/v1/courses
 		 */
 		Route::apiResource("courses", CoursesApis::class)->only(["index", "store", "update", "destroy"]);
+	});
+
+	/* Promotion Apis */
+	Route::group(["middleware" => ["auth:sanctum", "adminOnly"], "controller" => PromotionApis::class], function () {
+		/**
+		 * @todo Custom endpoints defination
+		 */
+		Route::group(["prefix" => "promotions"], function () {
+			/**
+			 * @todo Apply promotion code
+			 * @api /api/v1/promotions/apply
+			 */
+			Route::post("apply", "applyCode")->withoutMiddleware(["adminOnly"]);
+		});
+		/**
+		 * @todo REST Endpoints
+		 * @api /api/v1/promotions
+		 */
+		Route::apiResource("promotions", PromotionApis::class);
 	});
 });
