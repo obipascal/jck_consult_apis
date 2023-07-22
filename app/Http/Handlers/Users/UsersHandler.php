@@ -137,6 +137,12 @@ class UsersHandler
 
 			$params = $this->request->all(["first_name", "last_name", "phone_number", "gender", "qualification", "password"]);
 
+			foreach ($params as $param => $value) {
+				if (empty($value)) {
+					unset($params[$param]);
+				}
+			}
+
 			if (!Modules::User()->update($id, $params)) {
 				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
@@ -163,16 +169,97 @@ class UsersHandler
 		}
 	}
 
-	public function fetchUser(string $id): UsersHandler
+	public function fetchProfile(string $id): UsersHandler
 	{
 		try {
 			DB::beginTransaction();
 
-			$User = Modules::User()->get($id);
+			if (!($User = Modules::User()->get($id))) {
+				return $this->raise(APIResponseMessages::NOT_FOUND->value, null, APIResponseCodes::NOT_FOUND->value);
+			}
+
+			$User->api_token = $User->access_token;
+			$User->role = $User->getRoleNames()[0];
+			unset($User->roles);
 			//-----------------------------------------------------
 
 			/** Request response data */
 			$responseMessage = "Success, user retrieved";
+			$response["type"] = "account";
+			$response["body"] = $User;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function fetchUser(): UsersHandler
+	{
+		try {
+			DB::beginTransaction();
+
+			/** @var User */
+			$User = $this->request->user();
+
+			$User->api_token = $User->access_token;
+			$User->role = $User->getRoleNames()[0];
+			unset($User->roles);
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, user retrieved";
+			$response["type"] = "account";
+			$response["body"] = $User;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function updateUser(): UsersHandler
+	{
+		try {
+			DB::beginTransaction();
+
+			$params = $this->request->all(["first_name", "last_name", "phone_number", "gender", "qualification", "password"]);
+
+			/** @var User */
+			$User = $this->request->user();
+
+			foreach ($params as $param => $value) {
+				if (empty($value)) {
+					unset($params[$param]);
+				}
+			}
+
+			if (!Modules::User()->update($User->account_id, $params)) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			$User = Modules::User()->get($User->account_id);
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, profile updated successfully!";
 			$response["type"] = "account";
 			$response["body"] = $User;
 			$responseCode = 200;
@@ -261,7 +348,7 @@ class UsersHandler
 		}
 	}
 
-	public function authorized()
+	public function authorized(): UsersHandler
 	{
 		try {
 			DB::beginTransaction();

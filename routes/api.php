@@ -58,6 +58,16 @@ Route::prefix("v1")->group(function () {
 			 * @api /api/v1/accountn/:account_id
 			 */
 			Route::delete("/{id}", "destroy");
+			/**
+			 * @todo Fetch user profile
+			 * @api /api/v1/account/
+			 */
+			Route::get("/", "user");
+			/**
+			 * @todo Update user
+			 * @api /api/v1/account
+			 */
+			Route::put("/", "updateUser");
 		});
 		/**
 		 * @todo Forget password
@@ -79,12 +89,23 @@ Route::prefix("v1")->group(function () {
 	});
 
 	/* Settings API */
-	Route::group(["prefix" => "settings", "controller" => SettingsApi::class, "middleware" => "auth:sanctum"], function () {
+	Route::group(["prefix" => "settings", "controller" => SettingsApi::class, "middleware" => ["auth:sanctum", "adminOnly"]], function () {
+		/**
+		 * @todo Fetch webiste configs
+		 * @api /api/v1/settings
+		 */
+		Route::get("/", "index")->withoutMiddleware(["auth:sanctum", "adminOnly"]);
+
 		/**
 		 * @todo Create application settings
 		 * @api /api/v1/settings
 		 */
 		Route::post("/", "store");
+		/**
+		 * @todo Upload website logo
+		 * @api /api/v1/settings/logo
+		 */
+		Route::post("logo", "updateLogo");
 		/**
 		 * @todo Fetch site settings
 		 * @api /api/v1/settings/:site_id

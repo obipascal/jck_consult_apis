@@ -8,6 +8,7 @@ enum APIResponseMessages: string
 	case OPS_ABORTED = "Sorry! Unable to complete your request at the moment.";
 	case PSWD_OPS_EXP = "Sorry! The password reset operation has expired.";
 	case UPL_ERR = "Sorry! We're unable to process your file upload at the mement please try again in a few minutes.";
+	case UPL_CONFIG_REQ = "Please update site settings first before uploading logo.";
 	case INVALID_PWD = "Incorrect account password. Please check the password and try again!";
 	case RES_UNAUTHORIZED = "Sorry, you're not authorized to access this resource.";
 	case NOT_FOUND = "Sorry, the resource you're attempting access does not exist.";
