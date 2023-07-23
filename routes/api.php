@@ -34,6 +34,12 @@ Route::prefix("v1")->group(function () {
 		/* protected routes */
 		Route::middleware("auth:sanctum")->group(function () {
 			/**
+			 * @todo Fetch user profile
+			 * @api /api/v1/account/
+			 */
+			Route::get("/", "user");
+
+			/**
 			 * @todo Verify account
 			 * @api /api/v1/account/verify
 			 */
@@ -58,11 +64,7 @@ Route::prefix("v1")->group(function () {
 			 * @api /api/v1/accountn/:account_id
 			 */
 			Route::delete("/{id}", "destroy");
-			/**
-			 * @todo Fetch user profile
-			 * @api /api/v1/account/
-			 */
-			Route::get("/", "user");
+
 			/**
 			 * @todo Update user
 			 * @api /api/v1/account
