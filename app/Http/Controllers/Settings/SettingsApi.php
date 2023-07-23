@@ -57,7 +57,7 @@ class SettingsApi extends Controller
 				"name" => ["bail", "string", "nullable"],
 				"desc" => ["bail", "string", "nullable"],
 				"about" => ["bail", "string", "nullable"],
-				"phone_number" => ["bail", "numeric", "nullable"],
+				"phone_number" => ["bail", "string", "nullable"],
 				"email" => ["bail", "email", "nullable"],
 				"line_address" => ["bail", "string", "nullable"],
 				"facebook_handle" => ["bail", "string", "nullable"],
