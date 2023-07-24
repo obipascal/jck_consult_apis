@@ -132,7 +132,7 @@ class CoursesApis extends Controller
 				"price" => ["bail", "string", "required"],
 				"body" => ["bail", "string", "required"],
 				"status" => ["bail", "string", "required"],
-				"image" => ["bail", "file", "required", "mimes:jpg,jpeg,png"],
+				"image" => ["bail", "file", "required", "mimes:jpg,jpeg,png,webp"],
 			]);
 
 			/* Check if any validation fails */
@@ -252,7 +252,7 @@ class CoursesApis extends Controller
 				["course_id" => $id, ...$request->all()],
 				[
 					"course_id" => ["bail", "numeric", "required", "exists:courses,course_id"],
-					"image" => ["bail", "file", "nullable", "mimes:jpg,jpeg,png"],
+					"image" => ["bail", "file", "nullable", "mimes:jpg,jpeg,png,webp"],
 				]
 			);
 

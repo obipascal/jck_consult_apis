@@ -15,4 +15,9 @@ class FAQs extends Model
 	{
 		return Attribute::get(fn($value) => !empty($value) ? html_entity_decode($value) : $value);
 	}
+
+	public function title(): Attribute
+	{
+		return Attribute::set(fn($value) => !empty($value) ? ucwords($value) : $value);
+	}
 }

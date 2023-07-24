@@ -3,7 +3,9 @@
 use App\Http\Handlers\Core\BaseHandler;
 use App\Http\Modules\Modules;
 use App\Models\Users\User;
+use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -291,9 +293,12 @@ class CoursesHandler
 			$perPage = $this->request->get("perPage") ?? 100;
 			$status = $this->request->get("filter") ?? "all";
 
+			/**@var Collection */
 			if (!($Courses = Modules::Courses()->getCourses($status, $perPage))) {
 				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
+
+			$Courses->each(fn($course) => ($course->last_modified = Carbon::createFromDate($course->updated_at)->toDayDateTimeString()));
 
 			//-----------------------------------------------------
 

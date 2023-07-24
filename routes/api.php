@@ -165,7 +165,7 @@ Route::prefix("v1")->group(function () {
 			 *
 			 * @api /api/v1/courses/:id
 			 */
-			Route::post("/{id}", "updateImage");
+			Route::post("/{id}", "updateImage")->whereNumber("id");
 			/**
 			 * @todo View coures
 			 * @api /api/v1/courses/:id

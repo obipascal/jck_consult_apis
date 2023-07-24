@@ -23,6 +23,7 @@ return new class extends Migration {
 			$table->string("desc");
 			$table->float("price")->default(0);
 			$table->string("image");
+			$table->string("image_thumbnail")->nullable();
 			$table->text("body");
 			$table->enum("status", ["published", "drafted"])->default("drafted");
 			$table->timestamps();
