@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use JCKCon\Http\Handlers\Courses\CoursesHandler;
 use JCKCon\Http\Handlers\Misc\MiscHandler;
 use JCKCon\Http\Handlers\Promos\PromosHandler;
+use JCKCon\Http\Handlers\Reviews\ReviewsHandler;
 use JCKCon\Http\Handlers\Settings\SettingsHandler;
 use JCKCon\Http\Handlers\Transaction\TransactionHandler;
 use JCKCon\Http\Handlers\Users\UsersHandler;
@@ -38,5 +39,10 @@ class Handlers
 	public static function Trans(Request $request)
 	{
 		return new TransactionHandler($request);
+	}
+
+	public static function Reviews(Request $request)
+	{
+		return new ReviewsHandler($request);
 	}
 }

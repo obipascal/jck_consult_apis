@@ -18,7 +18,6 @@ class TransactionsApi extends Controller
 	 */
 	public function index()
 	{
-		//
 	}
 
 	/**
@@ -30,6 +29,7 @@ class TransactionsApi extends Controller
 			/* Run validation  */
 			$validator = Validator::make($request->all(), [
 				"course" => ["bail", "numeric", "required", "exists:courses,course_id"],
+				"promo_id" => ["bail", "numeric", "nullable", "exists:promo_codes,promo_id"],
 			]);
 
 			/* Check if any validation fails */

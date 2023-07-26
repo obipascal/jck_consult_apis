@@ -272,7 +272,7 @@ class PromosHandler
 			if (!Modules::Promo()->isCodeApplied($Code->promo_id, $User->account_id)) {
 				if ($todaysDate >= $fromDate && $toDate >= $todaysDate) {
 					$usageData["status"] = "applied";
-					$usageData["applied_amount"] = PercentageCalculator::PercentageOfX($Code->disc_percentage, $Course->price);
+					$usageData["discounted_amount"] = PercentageCalculator::PercentageOfX($Code->disc_percentage, $Course->price);
 
 					if (!($Usage = Modules::Promo()->addCodeUsage($Code->promo_id, $User->account_id, $usageData))) {
 						return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);

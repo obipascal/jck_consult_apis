@@ -25,6 +25,7 @@ return new class extends Migration {
 				->cascadeOnDelete();
 
 			$table->float("amount")->default(0);
+			$table->float("discount")->default(0);
 			$table->string("reference")->unique();
 			$table->enum("status", ["pending", "success", "failed", "error"])->default("pending");
 			$table->string("pi_id");

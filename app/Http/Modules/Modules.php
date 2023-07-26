@@ -3,6 +3,7 @@
 use JCKCon\Http\Modules\Courses\CoursesModule;
 use JCKCon\Http\Modules\Misc\MiscModule;
 use JCKCon\Http\Modules\Promo\PromoCodesModule;
+use JCKCon\Http\Modules\Reviews\ReviewsModule;
 use JCKCon\Http\Modules\Settings\SettingsModule;
 use JCKCon\Http\Modules\Transaction\TransactionModule;
 use JCKCon\Http\Modules\Users\UsersModule;
@@ -37,5 +38,10 @@ class Modules
 	public static function Trans()
 	{
 		return new TransactionModule();
+	}
+
+	public static function Reviews()
+	{
+		return new ReviewsModule();
 	}
 }

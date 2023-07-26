@@ -48,7 +48,7 @@ trait PromoCodeUsageModule
 	{
 		try {
 			return PromoCodeUsage::query()
-				->where(["account_id" => $accountId, "promo_id" => $promoId])
+				->where(["account_id" => $accountId, "promo_id" => $promoId, "status" => "applied"])
 				->first();
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);

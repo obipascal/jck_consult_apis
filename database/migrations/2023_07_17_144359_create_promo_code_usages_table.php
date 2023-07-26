@@ -23,7 +23,7 @@ return new class extends Migration {
 				->cascadeOnUpdate()
 				->cascadeOnDelete();
 
-			$table->float("applied_amount")->default(0);
+			$table->float("discounted_amount")->default(0);
 
 			$table->enum("status", ["applied", "used", "expired"])->default("applied");
 

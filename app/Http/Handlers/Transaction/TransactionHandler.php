@@ -25,7 +25,7 @@ class TransactionHandler
 			/** @var User */
 			$User = $this->request->user();
 
-			$params = $this->request->all(["course"]);
+			$params = $this->request->all(["course", "promo_id"]);
 
 			/* obtain the course  */
 			if (!($Course = Modules::Courses()->get($params["course"]))) {
@@ -37,9 +37,32 @@ class TransactionHandler
 				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
 
+			/* get the promo if present and apply the discount amount */
+			if (!empty($params["promo_id"])) {
+				if (!($Promo = Modules::Promo()->getCodeUsage($params["promo_id"], $User->account_id))) {
+					return $this->raise("Invalid promo code or promo has expired.");
+				}
+
+				if (!$Promo->discounted_amount > $Course->price) {
+					return $this->raise("Invalid promo discount amount. Amount cannot be greater than course price.");
+				}
+
+				// apply discount to course price
+				$Amount = $Course->price - $Promo->discounted_amount;
+				$Discount = $Promo->discounted_amount;
+
+				// update the promo status
+				if (!Modules::Promo()->updateCodeUsage($Promo->promo_id, $User->account_id, ["status" => "used"])) {
+					return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+				}
+			} else {
+				$Amount = $Course->price;
+				$Discount = 0;
+			}
+
 			/* generate a payment  */
 			$paymentInt = $StripeService->paymentIntents->create([
-				"amount" => $Course->price * 100,
+				"amount" => $Amount * 100,
 				"currency" => config("stripe.currency"),
 				"description" => "Course enrollment for {$Course->title}.",
 				"receipt_email" => $User->email,
@@ -53,7 +76,8 @@ class TransactionHandler
 				return $this->raise(APIResponseMessages::STRIPE_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
 
-			$_transData["amount"] = $Course->price;
+			$_transData["amount"] = $Amount;
+			$_transData["discount"] = $Discount;
 			$_transData["pi_id"] = $_response->id;
 			$_transData["cs_code"] = $_response->client_secret;
 			$_transData["course_id"] = $Course->course_id;
