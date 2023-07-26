@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Courses\CourseMaterialsApi;
 use App\Http\Controllers\Courses\CoursesApis;
+use App\Http\Controllers\Misc\EnquiriesApi;
 use App\Http\Controllers\Promos\PromotionApis;
 use App\Http\Controllers\Settings\SettingsApi;
 use App\Http\Controllers\Users\UsersApis;
@@ -120,7 +122,7 @@ Route::prefix("v1")->group(function () {
 			 * @todo fetch all faqs
 			 * @api /api/v1/settings/faqs
 			 */
-			Route::get("/", "indexFAQ");
+			Route::get("/", "indexFAQ")->withoutMiddleware(['auth:sanctum','adminOnly']);
 			/**
 			 * @todo Create a new faq
 			 * @api /api/v1/settings/faqs
@@ -196,5 +198,41 @@ Route::prefix("v1")->group(function () {
 		 * @api /api/v1/promotions
 		 */
 		Route::apiResource("promotions", PromotionApis::class);
+	});
+
+	/* Enquiries  */
+	Route::group(["middleware" => ["auth:sanctum", "adminOnly"], "controller" => EnquiriesApi::class], function () {
+		/**
+		 * @todo Custom endpoints
+		 */
+		Route::group(["prefix" => "enquiries"], function () {
+			/**
+			 * @todo handle make enquiry be users
+			 * @api /api/v1/enquiries
+			 */
+			Route::post("/", "store")->withoutMiddleware(["auth:sanctum", "adminOnly"]);
+		});
+		/**
+		 * @todo Enquiry rest endpoints
+		 * @api /api/v1/enquiries
+		 */
+		Route::apiResource("enquiries", EnquiriesApi::class)->only(["index", "show", "destroy"]);
+	});
+
+	/* Course Material Apis */
+	Route::group(["middleware" => ["auth:sanctum", "adminOnly"], "controller" => CourseMaterialsApi::class], function () {
+		/** Custom endpoints  */
+		Route::group(["prefix" => "materials"], function () {
+			/**
+			 * @todo Update material file
+			 * @api /api/v1/materials/:id
+			 */
+			Route::post("/{id}", "updateMaterialFile")->whereNumber("id");
+		});
+		/**
+		 * @todo REST Api endpoints
+		 * @api /api/v1/materials
+		 */
+		Route::apiResource("materials", CourseMaterialsApi::class);
 	});
 });

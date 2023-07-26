@@ -10,7 +10,7 @@ use function App\Utilities\random_id;
 
 class CoursesModule
 {
-	use BaseModule;
+	use BaseModule, CourseMaterialModule, CourseEnrollmentModule;
 
 	public function add(array $params): bool|Courses
 	{
@@ -76,7 +76,7 @@ class CoursesModule
 		}
 	}
 
-    public function remove(string $id): bool
+	public function remove(string $id): bool
 	{
 		try {
 			if (!($Course = $this->get($id))) {
@@ -117,6 +117,4 @@ class CoursesModule
 			return false;
 		}
 	}
-
-
 }

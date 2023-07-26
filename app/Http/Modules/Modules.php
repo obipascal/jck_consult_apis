@@ -1,8 +1,10 @@
 <?php namespace App\Http\Modules;
 
 use JCKCon\Http\Modules\Courses\CoursesModule;
+use JCKCon\Http\Modules\Misc\MiscModule;
 use JCKCon\Http\Modules\Promo\PromoCodesModule;
 use JCKCon\Http\Modules\Settings\SettingsModule;
+use JCKCon\Http\Modules\Transaction\TransactionModule;
 use JCKCon\Http\Modules\Users\UsersModule;
 
 class Modules
@@ -25,5 +27,15 @@ class Modules
 	public static function Promo()
 	{
 		return new PromoCodesModule();
+	}
+
+	public static function Misc()
+	{
+		return new MiscModule();
+	}
+
+	public static function Trans()
+	{
+		return new TransactionModule();
 	}
 }

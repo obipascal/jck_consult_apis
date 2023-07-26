@@ -15,7 +15,7 @@ use JCKCon\Enums\APIResponseMessages;
 
 class CoursesHandler
 {
-	use BaseHandler;
+	use BaseHandler, CourseMaterialHandler;
 
 	protected function processImageUpload(?string $id = null): bool|string
 	{
