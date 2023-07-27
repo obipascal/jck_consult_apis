@@ -16,6 +16,7 @@ enum APIResponseMessages: string
 	case PROMO_INACTIVE = "This promo code is not yet active. It looks like you're trying to apply a promo code that is set to go live on :duration, please check back later to try again thank you!";
 	case PROMO_EXP = "This promo code has expired an cannot be used.";
 	case STRIPE_ERROR = "Service Error: Unable to reach the payment processor service.";
+	case ALREADY_ENROLLED = "Sorry! You're already enrolled in this course.";
 
 	public static function inActivePromoCode(string $duration)
 	{

@@ -131,4 +131,16 @@ class TransactionModule
 			return false;
 		}
 	}
+
+	public function getFromPayIntent(string $pid): bool|null|Transactions
+	{
+		try {
+			return Transactions::query()
+				->where("pi_id", $pid)
+				->first();
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+			return false;
+		}
+	}
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use JCKCon\Enums\APIResponseCodes;
 use JCKCon\Enums\APIResponseMessages;
+use JCKCon\Enums\TransStatus;
 use Stripe\StripeClient;
 
 use function App\Utilities\random_string;
@@ -26,6 +27,11 @@ class TransactionHandler
 			$User = $this->request->user();
 
 			$params = $this->request->all(["course", "promo_id"]);
+
+			/* make sure user is not enrolled in the course  */
+			if (Modules::Courses()->isEnrolled($User->account_id, $params["course"])) {
+				return $this->raise(APIResponseMessages::ALREADY_ENROLLED->value, null, APIResponseCodes::CLIENT_ERR->value);
+			}
 
 			/* obtain the course  */
 			if (!($Course = Modules::Courses()->get($params["course"]))) {
@@ -109,18 +115,43 @@ class TransactionHandler
 		}
 	}
 
-	public function confirm(mixed $params = null)
+	public function succeeded(\Stripe\PaymentIntent $paymentInt)
 	{
 		try {
 			DB::beginTransaction();
 
-			$params = $this->request->all([""]);
+			if (!($Trans = Modules::Trans()->getFromPayIntent($paymentInt->id))) {
+				throw new Exception(APIResponseMessages::NOT_FOUND->value, APIResponseCodes::NOT_FOUND->value);
+			}
+
+			/* update transactions status */
+			$params["status"] = TransStatus::SUCCESS->value;
+			if (!Modules::Trans()->update($Trans->trans_id, $params)) {
+				throw new Exception(APIResponseMessages::DB_ERROR->value, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			/* get the updated transaction object */
+			$Trans = Modules::Trans()->get($Trans->trans_id);
+
+			/**
+			 * @todo Add customer to course enrollments and set the status to enrolled
+			 */
+			$_enrollData["trans_id"] = $Trans->trans_id;
+			$_enrollData["account_id"] = $Trans->account_id;
+			$_enrollData["course_id"] = $Trans->course_id;
+			if (!Modules::Courses()->addEnrollment($_enrollData)) {
+				throw new Exception(APIResponseMessages::DB_ERROR->value, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			/**
+			 * @todo Send customer a payment receipt via email
+			 */
 
 			//-----------------------------------------------------
 
 			/** Request response data */
 			$responseMessage = "Success";
-			$response["type"] = "";
+			$response["type"] = "transaction";
 			$response["body"] = null;
 			$responseCode = 200;
 
