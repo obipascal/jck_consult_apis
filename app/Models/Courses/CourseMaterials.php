@@ -16,4 +16,9 @@ class CourseMaterials extends Model
 
 		return Attribute::get(fn($value) => !empty($value) ? "{$baseUrl}/{$value}" : $value);
 	}
+
+	public function course()
+	{
+		return $this->belongsTo(Courses::class, "course_id", "course_id");
+	}
 }

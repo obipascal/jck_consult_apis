@@ -58,7 +58,7 @@ class CoursesModule
 	public function getCourses(string $status = "all", int $perPage = 50): bool|Paginator
 	{
 		try {
-			$query = Courses::query();
+			$query = Courses::query()->with(["materials"]);
 			return match ($status) {
 				"drafted" => $query
 					->where("status", "drafted")

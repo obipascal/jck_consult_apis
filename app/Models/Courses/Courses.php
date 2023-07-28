@@ -21,4 +21,9 @@ class Courses extends Model
 	{
 		return Attribute::get(fn($value) => !empty($value) ? html_entity_decode($value) : $value);
 	}
+
+	public function materials()
+	{
+		return $this->hasMany(CourseMaterials::class, "course_id", "course_id");
+	}
 }
