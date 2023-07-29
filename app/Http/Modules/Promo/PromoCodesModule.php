@@ -4,6 +4,7 @@ use App\Http\Modules\Core\BaseModule;
 use App\Models\Promos\PromoCodes;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Facades\Log;
 use JCKCon\Http\Modules\Promo\PromoCodeUsageModule;
@@ -60,12 +61,12 @@ class PromoCodesModule
 		}
 	}
 
-	public function getPromoCodes(int $perPage = 50): bool|Paginator
+	public function getPromoCodes(int $perPage = 50): bool|LengthAwarePaginator
 	{
 		try {
 			return PromoCodes::query()
 				->latest()
-				->simplePaginate($perPage);
+				->paginate($perPage);
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;

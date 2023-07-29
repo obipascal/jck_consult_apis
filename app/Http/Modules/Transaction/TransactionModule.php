@@ -59,6 +59,7 @@ class TransactionModule
 		try {
 			return Transactions::query()
 				->where("trans_id", $id)
+				->with(["course", 'user'])
 				->orWhere("reference", $id)
 				->first();
 		} catch (Exception $th) {
@@ -72,6 +73,7 @@ class TransactionModule
 		try {
 			return Transactions::query()
 				->latest()
+				->with(["course", 'user'])
 				->paginate($perPage);
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
@@ -79,13 +81,14 @@ class TransactionModule
 		}
 	}
 
-	public function usersTransactions(string $accountId, int $perPage = 50): bool|Paginator
+	public function usersTransactions(string $accountId, int $perPage = 50): bool|LengthAwarePaginator
 	{
 		try {
 			return Transactions::query()
 				->where("account_id", $accountId)
 				->latest()
-				->simplePaginate($perPage);
+				->with(["course", 'user'])
+				->paginate($perPage);
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;

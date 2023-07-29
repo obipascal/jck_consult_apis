@@ -6,6 +6,7 @@ use App\Models\Users\User;
 use App\Utilities\PercentageCalculator;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use JCKCon\Enums\APIResponseCodes;
@@ -124,6 +125,10 @@ class PromosHandler
 				return $this->raise(APIResponseMessages::NOT_FOUND->value, null, APIResponseCodes::NOT_FOUND->value);
 			}
 
+			$Promo->starts = Carbon::createFromDate($Promo->valid_from)->toDayDateTimeString();
+			$Promo->ends = Carbon::createFromDate($Promo->valid_to)->toDayDateTimeString();
+			$Promo->expired = Carbon::now() > Carbon::createFromDate($Promo->valid_to);
+
 			/* Add additional information about the promotion for more clusure. */
 			$from = Carbon::createFromDate($Promo->valid_from);
 			$to = Carbon::createFromDate($Promo->valid_to);
@@ -165,9 +170,16 @@ class PromosHandler
 			DB::beginTransaction();
 			$perPage = $this->request->get("perPage") ?? 50;
 
+			/** @var Collection */
 			if (!($Promos = Modules::Promo()->getPromoCodes($perPage))) {
 				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
+
+			$Promos->each(function ($promo) {
+				$promo->starts = Carbon::createFromDate($promo->valid_from)->toDayDateTimeString();
+				$promo->ends = Carbon::createFromDate($promo->valid_to)->toDayDateTimeString();
+				$promo->expired = Carbon::now() > Carbon::createFromDate($promo->valid_to);
+			});
 
 			//-----------------------------------------------------
 

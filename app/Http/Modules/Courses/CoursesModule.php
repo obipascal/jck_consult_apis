@@ -59,6 +59,7 @@ class CoursesModule
 	{
 		try {
 			$query = Courses::query()->with(["materials"]);
+
 			return match ($status) {
 				"drafted" => $query
 					->where("status", "drafted")

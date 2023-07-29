@@ -2,6 +2,7 @@
 
 use App\Http\Handlers\Core\BaseHandler;
 use App\Http\Modules\Modules;
+use App\Models\Users\User;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -153,6 +154,102 @@ class TransactionHandler
 			$responseMessage = "Success";
 			$response["type"] = "transaction";
 			$response["body"] = null;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function transaction(string $id)
+	{
+		try {
+			DB::beginTransaction();
+
+			if (!($Tran = Modules::Trans()->get($id))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, transaction retrieved";
+			$response["type"] = "transaction";
+			$response["body"] = $Tran;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function userTransactions()
+	{
+		try {
+			DB::beginTransaction();
+
+			$perPage = $this->request->get("perPage") ?? 50;
+			/** @var User */
+			$User = $this->request->user();
+
+			if (!($Trans = Modules::Trans()->usersTransactions($User->account_id, $perPage))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, user transactions retrieved";
+			$response["type"] = "transaction";
+			$response["body"] = $Trans;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function transactions()
+	{
+		try {
+			DB::beginTransaction();
+
+			$perPage = $this->request->get("perPage") ?? 50;
+
+			if (!($Trans = Modules::Trans()->all($perPage))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, transactions retrieved.";
+			$response["type"] = "transactions";
+			$response["body"] = $Trans;
 			$responseCode = 200;
 
 			DB::commit();

@@ -13,11 +13,11 @@ class PromoCodes extends Model
 
 	public function validFrom(): Attribute
 	{
-		return Attribute::set(fn($value) => !empty($value) ? Carbon::createFromDate($value)->toDateTimeString() : $value);
+		return Attribute::make(set: fn($value) => !empty($value) ? Carbon::createFromDate($value)->toDateTimeString() : $value);
 	}
 
 	public function validTo(): Attribute
 	{
-		return Attribute::set(fn($value) => !empty($value) ? Carbon::createFromDate($value)->toDateTimeString() : $value);
+		return Attribute::make(set: fn($value) => !empty($value) ? Carbon::createFromDate($value)->toDateTimeString() : $value);
 	}
 }
