@@ -7,5 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class CourseEnrollments extends Model
 {
-    use HasFactory;
+	use HasFactory;
+
+	public function course()
+	{
+		return $this->belongsTo(Courses::class, "course_id", "course_id");
+	}
 }

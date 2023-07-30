@@ -293,7 +293,7 @@ class CoursesHandler
 			$perPage = $this->request->get("perPage") ?? 100;
 			$status = $this->request->get("filter") ?? "all";
 
-			/**@var Collection */
+			/** @var Collection */
 			if (!($Courses = Modules::Courses()->getCourses($status, $perPage))) {
 				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
@@ -382,6 +382,38 @@ class CoursesHandler
 			$response["type"] = "courses";
 			$response["body"] = null;
 			$responseCode = 204;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function userEnrolledCourses()
+	{
+		try {
+			DB::beginTransaction();
+
+			$perPage = $this->request->get("perPage") ?? 50;
+			$User = $this->request->user();
+
+			/** @var Collection */
+			$EnrolledCourses = Modules::Courses()->userEnrollments($User->account_id, $perPage);
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, user enrolled courses retrieved.";
+			$response["type"] = "courses";
+			$response["body"] = $EnrolledCourses;
+			$responseCode = 200;
 
 			DB::commit();
 

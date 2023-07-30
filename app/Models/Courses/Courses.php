@@ -10,6 +10,8 @@ class Courses extends Model
 {
 	use HasFactory;
 
+	protected $with = ["materials"];
+
 	public function image(): Attribute
 	{
 		$baseUrl = config("app.url");
