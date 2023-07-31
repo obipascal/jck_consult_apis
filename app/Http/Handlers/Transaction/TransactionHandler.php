@@ -17,7 +17,8 @@ class TransactionHandler
 {
 	use BaseHandler;
 
-	public function checkout()
+
+	public function checkout():TransactionHandler
 	{
 		try {
 			DB::beginTransaction();

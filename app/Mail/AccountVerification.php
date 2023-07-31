@@ -13,6 +13,7 @@ class AccountVerification extends Mailable
 {
 	use Queueable, SerializesModels;
 
+	public $layout_header = "default";
 	/**
 	 * Create a new message instance.
 	 */

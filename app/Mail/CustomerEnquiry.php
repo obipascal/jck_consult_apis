@@ -9,14 +9,15 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class AdminConsoleCredentials extends Mailable
+class CustomerEnquiry extends Mailable
 {
 	use Queueable, SerializesModels;
-	public $layout_header = "default";
+
+	public $layout_header = "enquiry";
 	/**
 	 * Create a new message instance.
 	 */
-	public function __construct(public string $email, public string $password, public string $header = "Administrative Console")
+	public function __construct(public string $name, public string $email, public string $phoneNumber, public string $enquiryMessage, public string $enquirySubject)
 	{
 		//
 	}
@@ -26,7 +27,7 @@ class AdminConsoleCredentials extends Mailable
 	 */
 	public function envelope(): Envelope
 	{
-		return new Envelope(subject: "Admin Console");
+		return new Envelope(subject: "Customer Enquiry: {$this->enquirySubject}", replyTo: $this->email);
 	}
 
 	/**
@@ -34,7 +35,7 @@ class AdminConsoleCredentials extends Mailable
 	 */
 	public function content(): Content
 	{
-		return new Content(view: "email.adminCredentials");
+		return new Content(view: "email.enquiry");
 	}
 
 	/**

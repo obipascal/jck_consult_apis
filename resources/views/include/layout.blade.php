@@ -1,5 +1,6 @@
 @include('include.styles')
 @include('include.header')
+@include('include.enquiryHeader')
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -40,7 +41,13 @@
             style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;padding:0;Margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#F6F6F6">
             <tr>
                 <td valign="top" style="padding:0;Margin:0">
+                    @switch($layout_header)
+                    @case('enquiry')
+                    @yield('enquiry_header')
+                    @break
+                    @default
                     @yield('header')
+                    @endswitch
                     @section('content')
                     @show
                     <table cellpadding="0" cellspacing="0" class="es-footer" align="center"
@@ -66,10 +73,10 @@
                                                                         target="_blank"
                                                                         href="https://sms.obitechinvent.com"
                                                                         style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img
-                                                                            src="https://parikq.stripocdn.email/content/guids/CABINET_764f172c510edee4485b1c321ecfd446/images/logocircle.png"
+                                                                            src="https://parikq.stripocdn.email/content/guids/CABINET_764f172c510edee4485b1c321ecfd446/images/mainasset.png"
                                                                             alt
                                                                             style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"
-                                                                            width="78" height="78"></a></td>
+                                                                            width="78" height="60"></a></td>
                                                             </tr>
                                                         </table>
                                                     </td>
@@ -79,7 +86,7 @@
                                     </tr>
                                     <tr>
                                         <td align="left"
-                                            style="padding:0;Margin:0;padding-bottom:20px;padding-left:20px;padding-right:20px">
+                                            style="Margin:0;padding-bottom:20px;padding-left:20px;padding-right:20px;padding-top:30px">
                                             <table cellpadding="0" cellspacing="0" width="100%"
                                                 style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                 <tr>
@@ -88,32 +95,22 @@
                                                             role="presentation"
                                                             style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                             <tr>
+                                                                <td align="center" style="padding:0;Margin:0">
+                                                                    <p
+                                                                        style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
+                                                                        © 2023&nbsp;JCK Consulting&nbsp;Ltd<br></p>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
                                                                 <td align="center"
-                                                                    style="padding:0;Margin:0;padding-top:15px;padding-bottom:15px;font-size:0">
-                                                                    <table cellpadding="0" cellspacing="0"
-                                                                        class="es-table-not-adapt es-social"
+                                                                    style="padding:20px;Margin:0;font-size:0">
+                                                                    <table border="0" width="60%" height="100%"
+                                                                        cellpadding="0" cellspacing="0"
                                                                         role="presentation"
                                                                         style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                         <tr>
-                                                                            <td align="center" valign="top"
-                                                                                style="padding:0;Margin:0;padding-right:40px">
-                                                                                <a target="_blank"
-                                                                                    href="https://web.facebook.com/groups/payve/"
-                                                                                    style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img
-                                                                                        title="Facebook"
-                                                                                        src="https://parikq.stripocdn.email/content/assets/img/social-icons/circle-colored/facebook-circle-colored.png"
-                                                                                        alt="Fb" width="32" height="32"
-                                                                                        style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></a>
-                                                                            </td>
-                                                                            <td align="center" valign="top"
-                                                                                style="padding:0;Margin:0"><a
-                                                                                    target="_blank"
-                                                                                    href="https://www.youtube.com/channel/UC8ihvucRzt_j0BzShI1VQUw"
-                                                                                    style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#FFFFFF;font-size:14px"><img
-                                                                                        title="Youtube"
-                                                                                        src="https://parikq.stripocdn.email/content/assets/img/social-icons/circle-colored/youtube-circle-colored.png"
-                                                                                        alt="Yt" width="32" height="32"
-                                                                                        style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></a>
+                                                                            <td
+                                                                                style="padding:0;Margin:0;border-bottom:1px solid #cccccc;background:unset;height:1px;width:100%;margin:0px">
                                                                             </td>
                                                                         </tr>
                                                                     </table>
@@ -122,13 +119,25 @@
                                                             <tr>
                                                                 <td align="center" style="padding:0;Margin:0">
                                                                     <p
-                                                                        style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
-                                                                        © 2023&nbsp;JCK Consultant&nbsp;Ltd&nbsp; All
-                                                                        Rights Reserved.</p>
-                                                                    <p
-                                                                        style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">
-                                                                        <br>
+                                                                        style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:20px;color:#333333;font-size:13px">
+                                                                        20-22, Wenlock Road, London, England, N1
+                                                                        7GU<br>&nbsp;info@jckconsulting.co.uk<br>+44-7492-162965
                                                                     </p>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td align="center"
+                                                                    style="padding:20px;Margin:0;font-size:0">
+                                                                    <table border="0" width="60%" height="100%"
+                                                                        cellpadding="0" cellspacing="0"
+                                                                        role="presentation"
+                                                                        style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
+                                                                        <tr>
+                                                                            <td
+                                                                                style="padding:0;Margin:0;border-bottom:1px solid #cccccc;background:unset;height:1px;width:100%;margin:0px">
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
                                                                 </td>
                                                             </tr>
                                                             <tr>

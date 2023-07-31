@@ -1,9 +1,11 @@
 <?php namespace JCKCon\Http\Handlers\Misc;
 
 use App\Http\Modules\Modules;
+use App\Mail\CustomerEnquiry;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use JCKCon\Enums\APIResponseCodes;
 use JCKCon\Enums\APIResponseMessages;
 
@@ -22,6 +24,9 @@ trait EnquiryHandler
 
 			$Configs = Modules::Settings()->getConfigs();
 			$siteName = $Configs->name;
+
+			Mail::to($Enquiry)->send(new CustomerEnquiry("{$Enquiry->first_name} {$Enquiry->last_name}", $Enquiry->email, $Enquiry->phone_number, $Enquiry->message, $Enquiry->subject));
+
 			//-----------------------------------------------------
 
 			/** Request response data */
