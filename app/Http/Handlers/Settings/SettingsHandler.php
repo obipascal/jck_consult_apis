@@ -106,7 +106,21 @@ class SettingsHandler
 				return $this->raise(APIResponseMessages::RES_UNAUTHORIZED->value, null, APIResponseCodes::UNAUTHORIZED->value);
 			}
 
-			$params = $this->request->all(["name", "desc", "about", "email", "phone_number", "line_address", "facebook_handle", "twitter_handle", "whatsapp_handle", "instagram_handle", "linkedin_handle"]);
+			$params = $this->request->all([
+				"name",
+				"desc",
+				"about",
+				"email",
+				"phone_number",
+				"line_address",
+				"facebook_handle",
+				"twitter_handle",
+				"whatsapp_handle",
+				"instagram_handle",
+				"linkedin_handle",
+				"terms",
+				"policy",
+			]);
 
 			foreach ($params as $param => $value) {
 				if (empty($value)) {

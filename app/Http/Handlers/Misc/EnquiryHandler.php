@@ -25,7 +25,7 @@ trait EnquiryHandler
 			$Configs = Modules::Settings()->getConfigs();
 			$siteName = $Configs->name;
 
-			Mail::to("info@jckconsulting.co.uk")->send(new CustomerEnquiry("{$Enquiry->first_name} {$Enquiry->last_name}", $Enquiry->email, $Enquiry->phone_number, $Enquiry->message, $Enquiry->subject));
+			Mail::to(config("mail.info_mail"))->send(new CustomerEnquiry("{$Enquiry->first_name} {$Enquiry->last_name}", $Enquiry->email, $Enquiry->phone_number, $Enquiry->message, $Enquiry->subject));
 
 			//-----------------------------------------------------
 

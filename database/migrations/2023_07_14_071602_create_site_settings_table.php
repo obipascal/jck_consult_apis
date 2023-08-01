@@ -25,6 +25,8 @@ return new class extends Migration {
 			$table->string("linkedin_handle")->nullable();
 			$table->string("whatsapp_handle")->nullable();
 			$table->string("logo")->nullable();
+			$table->text("terms")->nullable();
+			$table->text("policy")->nullable();
 			$table->timestamps();
 		});
 	}

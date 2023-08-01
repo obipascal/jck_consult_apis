@@ -66,6 +66,8 @@ class SettingsApi extends Controller
 				"instagram_handle" => ["bail", "string", "nullable"],
 				"linkedin_handle" => ["bail", "string", "nullable"],
 				"site_logo" => ["bail", "file", "nullable", "mimes:png,jpg,jpeg,svg"],
+				"terms" => ["bail", "string", "nullable"],
+				"policy" => ["bail", "string", "nullable"],
 			]);
 
 			/* Check if any validation fails */
