@@ -35,7 +35,7 @@
                                             <td align="left" style="padding:0;Margin:0;padding-top:25px">
                                                 <h1
                                                     style="Margin:0;line-height:51px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:34px;font-style:normal;font-weight:normal;color:#1e40af;margin-left:40px;text-align:left">
-                                                    {{ $enquirySubject }}
+                                                    {{ $enquirySubject ?? "" }}
                                                 </h1>
                                             </td>
                                         </tr>
