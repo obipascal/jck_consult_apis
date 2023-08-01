@@ -18,7 +18,7 @@ return new class extends Migration {
 			$table->string("reviewer_role")->default("Customer");
 			$table->string("reviewer_company")->default("JCK Consulting.");
 			$table->string("reviewer_image")->nullable();
-			$table->string("reviewer_message");
+			$table->text("reviewer_message")->nullable();
 			$table->enum("status", ["moderation", "published"])->default("moderation");
 			$table->timestamps();
 		});
