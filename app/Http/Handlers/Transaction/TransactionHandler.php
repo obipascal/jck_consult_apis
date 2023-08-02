@@ -2,10 +2,12 @@
 
 use App\Http\Handlers\Core\BaseHandler;
 use App\Http\Modules\Modules;
+use App\Mail\InstallmentalPaymentCollection;
 use App\Models\Users\User;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use JCKCon\Enums\APIResponseCodes;
 use JCKCon\Enums\APIResponseMessages;
 use JCKCon\Enums\TransStatus;
@@ -17,8 +19,7 @@ class TransactionHandler
 {
 	use BaseHandler;
 
-
-	public function checkout():TransactionHandler
+	public function checkout(): TransactionHandler
 	{
 		try {
 			DB::beginTransaction();
@@ -28,7 +29,7 @@ class TransactionHandler
 			/** @var User */
 			$User = $this->request->user();
 
-			$params = $this->request->all(["course", "promo_id"]);
+			$params = $this->request->all(["course", "promo_id", "payment_type"]);
 
 			/* make sure user is not enrolled in the course  */
 			if (Modules::Courses()->isEnrolled($User->account_id, $params["course"])) {
@@ -78,13 +79,23 @@ class TransactionHandler
 				"automatic_payment_methods" => [
 					"enabled" => true,
 				],
+				"metadata" => [
+					"course_name" => $Course->title,
+					"course_id" => $Course->course_id,
+				],
 			]);
 
 			if (!($_response = json_decode($paymentInt->toJSON()))) {
 				return $this->raise(APIResponseMessages::STRIPE_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
 			}
 
-			$_transData["amount"] = $Amount;
+			$_transData["amount"] = match ($params["payment_type"]) {
+				TransStatus::PARTIAL->value => round($Amount / 2, 2),
+				TransStatus::FULL->value => $Amount,
+				default => $Amount,
+			};
+			$_transData["original_amount"] = $Amount;
+			$_transData["payment_type"] = $params["payment_type"];
 			$_transData["discount"] = $Discount;
 			$_transData["pi_id"] = $_response->id;
 			$_transData["cs_code"] = $_response->client_secret;
@@ -117,6 +128,128 @@ class TransactionHandler
 		}
 	}
 
+	public function installmentCollection(string $id): TransactionHandler
+	{
+		try {
+			DB::beginTransaction();
+
+			$StripeService = new StripeClient(config("stripe.secret_key"));
+
+			/** @var User */
+			$User = $this->request->user();
+
+			if (!($Trans = Modules::Trans()->get($id))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			/* make sure the transaction payment type as been updated to first_installment */
+
+			if ($Trans->payment_type === TransStatus::FULL->value) {
+				return $this->raise("Sorry, this transaction has completed it's installment circle.");
+			}
+
+			if ($Trans->payment_type !== TransStatus::FIRST_INSTALL->value) {
+				return $this->raise("Sorry, you have not completed your previous payment for the first installment for this transaction.");
+			}
+
+			/* obtain the course  */
+			if (!($Course = Modules::Courses()->get($Trans->course_id))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			/* get application config */
+			if (!($Configs = Modules::Settings()->getConfigs())) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			/* generate a payment  */
+			$paymentInt = $StripeService->paymentIntents->create([
+				"amount" => $Trans->amount * 100,
+				"currency" => config("stripe.currency"),
+				"description" => "Full-payment for Course enrollment in {$Course->title}.",
+				"receipt_email" => $User->email,
+				"statement_descriptor" => $Configs->name,
+				"automatic_payment_methods" => [
+					"enabled" => true,
+				],
+				"metadata" => [
+					"course_name" => $Course->title,
+					"course_id" => $Course->course_id,
+				],
+			]);
+
+			if (!($_response = json_decode($paymentInt->toJSON()))) {
+				return $this->raise(APIResponseMessages::STRIPE_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			$_transData["pi_id"] = $_response->id;
+			$_transData["cs_code"] = $_response->client_secret;
+			$_transData["status"] = TransStatus::PENDING->value;
+
+			if (!Modules::Trans()->update($Trans->trans_id, $_transData)) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			$Trans = Modules::Trans()->get($Trans->trans_id);
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, payment initiated";
+			$response["type"] = "transactions";
+			$response["body"] = $Trans;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
+	public function requestInstallmentPayment(string $id): TransactionHandler
+	{
+		try {
+			DB::beginTransaction();
+
+			if (!($Trans = Modules::Trans()->get($id))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			/* obtain the course  */
+			if (!($Course = Modules::Courses()->get($Trans->course_id))) {
+				return $this->raise(APIResponseMessages::DB_ERROR->value, null, APIResponseCodes::SERVER_ERR->value);
+			}
+
+			$paymentLink = str_replace("apis.", "", config("app.url")) . "/enroll/installment/{$Trans->trans_id}";
+			Mail::to($Trans->user)->send(new InstallmentalPaymentCollection($paymentLink, $Course->title));
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, payment requested";
+			$response["type"] = "transactions";
+			$response["body"] = null;
+			$responseCode = 200;
+
+			DB::commit();
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			DB::rollBack();
+			DB::commit();
+
+			return $this->raise();
+		}
+	}
+
 	public function succeeded(\Stripe\PaymentIntent $paymentInt)
 	{
 		try {
@@ -128,6 +261,16 @@ class TransactionHandler
 
 			/* update transactions status */
 			$params["status"] = TransStatus::SUCCESS->value;
+			if ($Trans->payment_type === TransStatus::PARTIAL->value) {
+				$params["payment_type"] = TransStatus::FIRST_INSTALL->value;
+			}
+
+			if ($Trans->payment_type === TransStatus::FIRST_INSTALL->value) {
+				$params["payment_type"] = TransStatus::FULL->value;
+				// At this stage the original amount has been fully collected.
+				$params["amount"] = $Trans->original_amount;
+			}
+
 			if (!Modules::Trans()->update($Trans->trans_id, $params)) {
 				throw new Exception(APIResponseMessages::DB_ERROR->value, APIResponseCodes::SERVER_ERR->value);
 			}

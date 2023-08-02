@@ -24,10 +24,12 @@ return new class extends Migration {
 				->cascadeOnUpdate()
 				->cascadeOnDelete();
 
+			$table->float("original_amount")->default(0);
 			$table->float("amount")->default(0);
 			$table->float("discount")->default(0);
 			$table->string("reference")->unique();
 			$table->enum("status", ["pending", "success", "failed", "error"])->default("pending");
+			$table->enum("payment_type", ["initiated", "partial", "first_installment", "full"])->default("initiated");
 			$table->string("pi_id");
 			$table->string("cs_code");
 			$table->timestamps();
