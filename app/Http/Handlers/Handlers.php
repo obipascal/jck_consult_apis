@@ -1,6 +1,7 @@
 <?php namespace App\Http\Handlers;
 
 use Illuminate\Http\Request;
+use JCKCon\Http\Handlers\Analysis\AnalysisHandler;
 use JCKCon\Http\Handlers\Courses\CoursesHandler;
 use JCKCon\Http\Handlers\Misc\MiscHandler;
 use JCKCon\Http\Handlers\Promos\PromosHandler;
@@ -44,5 +45,10 @@ class Handlers
 	public static function Reviews(Request $request)
 	{
 		return new ReviewsHandler($request);
+	}
+
+	public static function Analysis(Request $request)
+	{
+		return new AnalysisHandler($request);
 	}
 }

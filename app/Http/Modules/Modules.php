@@ -1,5 +1,7 @@
 <?php namespace App\Http\Modules;
 
+use JCKCon\Http\Handlers\Analysis\AnalysisHandler;
+use JCKCon\Http\Modules\Analysis\AnalysisModule;
 use JCKCon\Http\Modules\Courses\CoursesModule;
 use JCKCon\Http\Modules\Misc\MiscModule;
 use JCKCon\Http\Modules\Promo\PromoCodesModule;
@@ -43,5 +45,10 @@ class Modules
 	public static function Reviews()
 	{
 		return new ReviewsModule();
+	}
+
+	public static function Analysis()
+	{
+		return new AnalysisModule();
 	}
 }
