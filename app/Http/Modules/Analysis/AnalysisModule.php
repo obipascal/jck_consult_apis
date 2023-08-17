@@ -12,7 +12,7 @@ class AnalysisModule
 {
 	use BaseModule;
 
-	public function getTotalUsers(): int
+	public function getTotalUsers(): bool|int
 	{
 		try {
 			return User::all()->count();
@@ -22,7 +22,7 @@ class AnalysisModule
 		}
 	}
 
-	public function getTotalCourses(): int
+	public function getTotalCourses(): bool|int
 	{
 		try {
 			return Courses::all()->count();
@@ -32,13 +32,20 @@ class AnalysisModule
 		}
 	}
 
-	public function getTotalRevenue()
+	public function getTotalRevenue(): bool|float|int
 	{
 		try {
-			return Transactions::query()
+			$trans = Transactions::query()
 				->where("status", TransStatus::SUCCESS->value)
-				->get()
-				->count();
+				->get();
+
+			$totalRevenue = 0;
+
+			foreach ($trans as $tran) {
+				$totalRevenue = $totalRevenue + $tran->amount;
+			}
+
+			return $totalRevenue;
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;
