@@ -258,10 +258,16 @@ class TransactionsApi extends Controller
 	{
 		try {
 			/* Run validation  */
-			$validator = Validator::make($request->all(), [
-				"course_id" => ["bail", "numeric", "required", "exists:courses,course_id"],
-				"account_ids" => ["bail", "array", "required", "exists:users,account_id"],
-			]);
+			$validator = Validator::make(
+				$request->all(),
+				[
+					"course_id" => ["bail", "numeric", "required", "exists:courses,course_id"],
+					"account_ids" => ["bail", "array", "required", "exists:users,account_id"],
+				],
+				[
+					"account_ids.required" => "Please select at least one user from the options.",
+				]
+			);
 
 			/* Check if any validation fails */
 			if ($validator->fails()) {

@@ -319,7 +319,15 @@ class TransactionHandler
 			$params = $this->request->all(["course_id", "account_ids"]);
 
 			$responseData = DB::transaction(function () use ($params) {
-				foreach ($params["account_ids"] as $account_id) {
+				$users = [];
+
+				foreach ($params["account_ids"] as $user) {
+					if (!Modules::Courses()->isEnrolled($user, $params["course_id"])) {
+						array_push($users, $user);
+					}
+				}
+
+				foreach ($users as $account_id) {
 					/* first get the course  */
 					$Course = Modules::Courses()->get($params["course_id"]);
 
