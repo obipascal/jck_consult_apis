@@ -26,6 +26,11 @@ Route::prefix("v1")->group(function () {
 			 * @api api/v1/transactions/request_payment/:id
 			 */
 			Route::get("request_payment/{id}", "requestPayment")->middleware("adminOnly");
+			/**
+			 * @todo Offline course enrollment
+			 * @api /api/v1/transactions/offline
+			 */
+			Route::post("offline", "offline")->middleware("adminOnly");
 		});
 
 		/**

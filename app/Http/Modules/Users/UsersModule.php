@@ -4,6 +4,7 @@ use App\Http\Modules\Core\BaseModule;
 use App\Models\Users\User;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
@@ -92,6 +93,18 @@ class UsersModule
 		}
 	}
 
+	public function all(string $except = null): bool|Collection
+	{
+		try {
+			return User::query()
+				->whereNot("account_id", $except)
+				->latest()
+				->get();
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+			return false;
+		}
+	}
 	public function remove(string $id): bool
 	{
 		try {

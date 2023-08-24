@@ -36,6 +36,12 @@ Route::prefix("v1")->group(function () {
 		/* protected routes */
 		Route::middleware("auth:sanctum")->group(function () {
 			/**
+			 * @todo Fetch all system users
+			 * @api /api/v1/account/users
+			 */
+			Route::get("users", "index")->middleware("adminOnly");
+
+			/**
 			 * @todo Fetch user profile
 			 * @api /api/v1/account/
 			 */

@@ -30,8 +30,11 @@ return new class extends Migration {
 			$table->string("reference")->unique();
 			$table->enum("status", ["pending", "success", "failed", "error"])->default("pending");
 			$table->enum("payment_type", ["initiated", "partial", "first_installment", "full"])->default("initiated");
-			$table->string("pi_id");
-			$table->string("cs_code");
+			// new
+			$table->enum("payment_method", ["online", "offline"])->default("online");
+			$table->string("pi_id")->nullable();
+			$table->string("cs_code")->nullable();
+
 			$table->timestamps();
 		});
 	}

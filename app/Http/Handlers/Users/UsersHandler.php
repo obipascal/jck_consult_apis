@@ -20,6 +20,36 @@ class UsersHandler
 {
 	use BaseHandler;
 
+	public function users()
+	{
+		try {
+			$params = $this->request->all([""]);
+
+			$User = $this->request->user();
+
+			$responseData = DB::transaction(function () use ($params, $User) {
+				if (!($Users = Modules::User()->all($User->account_id))) {
+					throw new Exception(APIResponseMessages::DB_ERROR->value, APIResponseCodes::SERVER_ERR->value);
+				}
+
+				return $Users;
+			}, attempts: 1);
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, users retrieved.";
+			$response["type"] = "account";
+			$response["body"] = $responseData;
+			$responseCode = 200;
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			return $this->raise($th->getMessage(), null, 400);
+		}
+	}
 	// ------------------------> [Profile]
 	public function create(): UsersHandler
 	{

@@ -234,7 +234,7 @@ class TransactionHandler
 			/** Request response data */
 			$responseMessage = "Success, payment requested";
 			$response["type"] = "transactions";
-			$response["body"] = null;
+			$response["body"] = $Trans;
 			$responseCode = 200;
 
 			DB::commit();
@@ -310,6 +310,56 @@ class TransactionHandler
 			DB::commit();
 
 			return $this->raise();
+		}
+	}
+
+	public function offlineEnrollment()
+	{
+		try {
+			$params = $this->request->all(["course_id", "account_ids"]);
+
+			$responseData = DB::transaction(function () use ($params) {
+				foreach ($params["account_ids"] as $account_id) {
+					/* first get the course  */
+					$Course = Modules::Courses()->get($params["course_id"]);
+
+					/* trans data */
+					$transData["course_id"] = $Course->course_id;
+					$transData["account_id"] = $account_id;
+					$transData["original_amount"] = $Course->price;
+					$transData["amount"] = $Course->price;
+					$transData["reference"] = "JCKRF_" . random_string("numeric");
+					$transData["status"] = "success";
+					$transData["payment_type"] = "full";
+					$transData["payment_method"] = "offline";
+
+					if (!($Trans = Modules::Trans()->add($transData))) {
+						throw new Exception(APIResponseMessages::DB_ERROR->value, APIResponseCodes::SERVER_ERR->value);
+					}
+
+					$_enrollData["trans_id"] = $Trans->trans_id;
+					$_enrollData["account_id"] = $Trans->account_id;
+					$_enrollData["course_id"] = $Trans->course_id;
+					if (!Modules::Courses()->addEnrollment($_enrollData)) {
+						throw new Exception(APIResponseMessages::DB_ERROR->value, APIResponseCodes::SERVER_ERR->value);
+					}
+				}
+				return null;
+			}, attempts: 1);
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, the selected user(s) has been enrolled successfully!";
+			$response["type"] = "transaction";
+			$response["body"] = $responseData;
+			$responseCode = 200;
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			return $this->raise($th->getMessage(), null, 400);
 		}
 	}
 
