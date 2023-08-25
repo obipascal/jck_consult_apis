@@ -4,6 +4,7 @@ use App\Http\Modules\Core\BaseModule;
 use App\Models\Users\User;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
@@ -86,6 +87,7 @@ class UsersModule
 			return User::query()
 				->where("account_id", $id)
 				->orWhere("email", $id)
+				->with("enrollments", fn($query) => $query->with("course"))
 				->first();
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
@@ -100,6 +102,19 @@ class UsersModule
 				->whereNot("account_id", $except)
 				->latest()
 				->get();
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+			return false;
+		}
+	}
+
+	public function paginate(string $except, int $perPage = 50): bool|LengthAwarePaginator
+	{
+		try {
+			return User::query()
+				->latest()
+				->whereNot("account_id", $except)
+				->paginate($perPage);
 		} catch (Exception $th) {
 			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
 			return false;

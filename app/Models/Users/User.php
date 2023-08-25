@@ -4,6 +4,8 @@ namespace App\Models\Users;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\Courses\CourseEnrollments;
+use App\Models\Courses\Courses;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -58,5 +60,10 @@ class User extends Authenticatable
 	public function billing_info()
 	{
 		return $this->hasOne(BillingInfo::class, "account_id", "account_id");
+	}
+
+	public function enrollments()
+	{
+		return $this->hasMany(CourseEnrollments::class, "account_id", "account_id");
 	}
 }

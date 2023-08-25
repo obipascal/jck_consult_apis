@@ -20,6 +20,36 @@ class UsersHandler
 {
 	use BaseHandler;
 
+	public function fetchUsers()
+	{
+		try {
+			$perPage = $this->request->get("perPage") ?? 50;
+
+			$responseData = DB::transaction(function () use ($perPage) {
+				$User = $this->request->user();
+
+				if (!($Users = Modules::User()->paginate($User->account_id, $perPage))) {
+					throw new Exception(APIResponseMessages::DB_ERROR->value, APIResponseCodes::SERVER_ERR->value);
+				}
+
+				return $Users;
+			}, attempts: 1);
+
+			//-----------------------------------------------------
+
+			/** Request response data */
+			$responseMessage = "Success, users retrieved";
+			$response["type"] = "account";
+			$response["body"] = $responseData;
+			$responseCode = 200;
+
+			return $this->response($response, $responseMessage, $responseCode);
+		} catch (Exception $th) {
+			Log::error($th->getMessage(), ["Line" => $th->getLine(), "file" => $th->getFile()]);
+
+			return $this->raise($th->getMessage(), null, 400);
+		}
+	}
 	public function users()
 	{
 		try {

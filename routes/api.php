@@ -36,10 +36,15 @@ Route::prefix("v1")->group(function () {
 		/* protected routes */
 		Route::middleware("auth:sanctum")->group(function () {
 			/**
-			 * @todo Fetch all system users
+			 * @todo Fetch all users
+			 * @api /api/v1/account/all
+			 */
+			Route::get("all", "index")->middleware("adminOnly");
+			/**
+			 * @todo Fetch users for manual course enrollment.
 			 * @api /api/v1/account/users
 			 */
-			Route::get("users", "index")->middleware("adminOnly");
+			Route::get("users", "users")->middleware("adminOnly");
 
 			/**
 			 * @todo Fetch user profile
